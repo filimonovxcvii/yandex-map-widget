@@ -1,35 +1,154 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Yandex Map</title>
-    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=7df67d6c-e265-428b-9f9c-4a3c9435612f" type="text/javascript"></script>
-    <style>
-      html, body, #map {
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script>
-      ymaps.ready(function () {
-        var myMap = new ymaps.Map("map", {
-          center: [55.751574, 37.573856],
-          zoom: 10,
-          controls: ['zoomControl', 'fullscreenControl']
-        });
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Выбор местоположения</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #fefaf6;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
 
-        var myPlacemark = new ymaps.Placemark([55.751574, 37.573856], {
-          hintContent: 'Пример метки',
-          balloonContent: 'Это Москва!'
-        });
+    header {
+      background-color: #ff6b00;
+      color: white;
+      padding: 16px;
+      font-size: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        myMap.geoObjects.add(myPlacemark);
+    .map-container {
+      flex: 1;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .confirm-button {
+      margin: 0 16px 24px;
+      padding: 14px;
+      font-size: 18px;
+      background-color: #ff6b00;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .confirm-button:hover {
+      background-color: #e65c00;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    .search-box {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 10px 16px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      font-size: 16px;
+      flex: 1;
+    }
+  </style>
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+  <script>
+    let selectedCoords = null;
+    let map, placemark;
+
+    ymaps.ready(function () {
+      map = new ymaps.Map("map", {
+        center: [55.76, 37.64],
+        zoom: 11,
+        controls: ['zoomControl', 'fullscreenControl']
       });
-    </script>
-  </body>
+
+      // Категории
+      const categories = [
+        { coords: [55.76, 37.64], hint: 'Пропала собака', icon: 'islands#redIcon' },
+        { coords: [55.75, 37.60], hint: 'Нашлась собака', icon: 'islands#greenIcon' },
+        { coords: [55.74, 37.65], hint: 'Видели собаку', icon: 'islands#blueIcon' },
+        { coords: [55.77, 37.67], hint: 'Насилие', icon: 'islands#blackIcon' },
+        { coords: [55.78, 37.61], hint: 'Событие для животных', icon: 'islands#orangeIcon' }
+      ];
+
+      categories.forEach(cat => {
+        const mark = new ymaps.Placemark(cat.coords, { hintContent: cat.hint }, { preset: cat.icon });
+        map.geoObjects.add(mark);
+      });
+
+      map.events.add("click", function (e) {
+        const coords = e.get("coords");
+        selectedCoords = coords;
+
+        if (!placemark) {
+          placemark = new ymaps.Placemark(coords, {}, {
+            preset: "islands#violetDotIcon"
+          });
+          map.geoObjects.add(placemark);
+        } else {
+          placemark.geometry.setCoordinates(coords);
+        }
+      });
+    });
+
+    function confirmLocation() {
+      if (selectedCoords) {
+        alert("Вы выбрали координаты: " + selectedCoords.join(", "));
+      } else {
+        alert("Пожалуйста, выберите точку на карте.");
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <img src="https://your-logo-url.svg" alt="Логотип" class="logo" />
+    Выберите местоположение
+  </header>
+
+  <div class="map-container">
+    <div class="search-box">
+      <input type="text" placeholder="Найти: приюты, кафе, груминг..." />
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <button class="confirm-button" onclick="confirmLocation()">
+    Сохранить местоположение
+  </button>
+</body>
 </html>
