@@ -1,154 +1,148 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Выбор местоположения</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Карта локаций</title>
   <style>
     body {
       margin: 0;
       font-family: 'Arial', sans-serif;
       background-color: #fefaf6;
       color: #333;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      height: 100vh;
     }
 
     header {
-      background-color: #ff6b00;
+      background-color: #f36f21;
       color: white;
       padding: 16px;
-      font-size: 20px;
+      font-size: 22px;
       text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .map-container {
-      flex: 1;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      margin: 16px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     #map {
-      width: 100%;
+      flex: 1;
       height: 100%;
-    }
-
-    .confirm-button {
-      margin: 0 16px 24px;
-      padding: 14px;
-      font-size: 18px;
-      background-color: #ff6b00;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .confirm-button:hover {
-      background-color: #e65c00;
-    }
-
-    .logo {
-      width: 36px;
-      height: 36px;
-      vertical-align: middle;
-      margin-right: 8px;
     }
 
     .search-box {
       position: absolute;
-      top: 20px;
+      top: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      padding: 10px 16px;
       z-index: 1000;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 12px 20px;
+      width: 80%;
+      max-width: 400px;
       display: flex;
+      gap: 8px;
       align-items: center;
-      width: 90%;
-      max-width: 500px;
     }
 
     .search-box input {
+      flex: 1;
       border: none;
       outline: none;
       font-size: 16px;
-      flex: 1;
+    }
+
+    .search-box button {
+      background: #f36f21;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .save-button {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background-color: #f36f21;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1000;
     }
   </style>
-  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-  <script>
-    let selectedCoords = null;
-    let map, placemark;
-
-    ymaps.ready(function () {
-      map = new ymaps.Map("map", {
-        center: [55.76, 37.64],
-        zoom: 11,
-        controls: ['zoomControl', 'fullscreenControl']
-      });
-
-      // Категории
-      const categories = [
-        { coords: [55.76, 37.64], hint: 'Пропала собака', icon: 'islands#redIcon' },
-        { coords: [55.75, 37.60], hint: 'Нашлась собака', icon: 'islands#greenIcon' },
-        { coords: [55.74, 37.65], hint: 'Видели собаку', icon: 'islands#blueIcon' },
-        { coords: [55.77, 37.67], hint: 'Насилие', icon: 'islands#blackIcon' },
-        { coords: [55.78, 37.61], hint: 'Событие для животных', icon: 'islands#orangeIcon' }
-      ];
-
-      categories.forEach(cat => {
-        const mark = new ymaps.Placemark(cat.coords, { hintContent: cat.hint }, { preset: cat.icon });
-        map.geoObjects.add(mark);
-      });
-
-      map.events.add("click", function (e) {
-        const coords = e.get("coords");
-        selectedCoords = coords;
-
-        if (!placemark) {
-          placemark = new ymaps.Placemark(coords, {}, {
-            preset: "islands#violetDotIcon"
-          });
-          map.geoObjects.add(placemark);
-        } else {
-          placemark.geometry.setCoordinates(coords);
-        }
-      });
-    });
-
-    function confirmLocation() {
-      if (selectedCoords) {
-        alert("Вы выбрали координаты: " + selectedCoords.join(", "));
-      } else {
-        alert("Пожалуйста, выберите точку на карте.");
-      }
-    }
-  </script>
 </head>
 <body>
   <header>
-    <img src="https://your-logo-url.svg" alt="Логотип" class="logo" />
-    Выберите местоположение
+    Стати Собаки: Карта локаций
   </header>
 
-  <div class="map-container">
-    <div class="search-box">
-      <input type="text" placeholder="Найти: приюты, кафе, груминг..." />
-    </div>
-    <div id="map"></div>
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Поиск: приюты, кафе, груминг и т.д.">
+    <button onclick="searchPlace()">Найти</button>
   </div>
 
-  <button class="confirm-button" onclick="confirmLocation()">
-    Сохранить местоположение
-  </button>
+  <div id="map"></div>
+
+  <button class="save-button" onclick="saveLocation()">Сохранить местоположение</button>
+
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=ВАШ_API_КЛЮЧ" type="text/javascript"></script>
+  <script>
+    let map;
+    ymaps.ready(init);
+
+    function init() {
+      map = new ymaps.Map("map", {
+        center: [55.751574, 37.573856],
+        zoom: 10,
+        controls: ['zoomControl']
+      });
+
+      // Категории — метки
+      const categories = [
+        { coords: [55.751, 37.57], name: "Пропала собака", color: 'red' },
+        { coords: [55.761, 37.58], name: "Нашлась собака", color: 'green' },
+        { coords: [55.771, 37.56], name: "Видели собаку", color: 'orange' },
+        { coords: [55.741, 37.55], name: "Событие", color: 'blue' },
+        { coords: [55.731, 37.59], name: "Насилие", color: 'black' }
+      ];
+
+      categories.forEach(cat => {
+        const placemark = new ymaps.Placemark(cat.coords, {
+          balloonContent: cat.name
+        }, {
+          preset: 'islands#icon',
+          iconColor: cat.color
+        });
+        map.geoObjects.add(placemark);
+      });
+    }
+
+    function searchPlace() {
+      const query = document.getElementById("search").value;
+      if (!query) return;
+      ymaps.geocode(query).then(function (res) {
+        const firstGeoObject = res.geoObjects.get(0);
+        if (firstGeoObject) {
+          const coords = firstGeoObject.geometry.getCoordinates();
+          map.setCenter(coords, 14);
+        }
+      });
+    }
+
+    function saveLocation() {
+      const center = map.getCenter();
+      alert(`Сохранено местоположение: ${center}`);
+      // Здесь можно отправить данные на сервер или в Supabase
+    }
+  </script>
 </body>
 </html>
