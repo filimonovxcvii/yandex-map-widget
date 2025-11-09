@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Yandex Map</title>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=7df67d6c-e265-428b-9f9c-4a3c9435612f" type="text/javascript"></script>
+    <style>
+      html, body, #map {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      ymaps.ready(function () {
+        var myMap = new ymaps.Map("map", {
+          center: [55.751574, 37.573856],
+          zoom: 10,
+          controls: ['zoomControl', 'fullscreenControl']
+        });
+
+        var myPlacemark = new ymaps.Placemark([55.751574, 37.573856], {
+          hintContent: 'Пример метки',
+          balloonContent: 'Это Москва!'
+        });
+
+        myMap.geoObjects.add(myPlacemark);
+      });
+    </script>
+  </body>
+</html>
